@@ -2,17 +2,28 @@ package org.firstinspires.ftc.teamcode.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.teamcode.R;
+
 public abstract class OmegaTeleop extends OpMode {
+
     public DcMotorEx intake;
 
-    DcMotorEx backRight;
-    DcMotorEx frontRight;
-    DcMotorEx backLeft;
-    DcMotorEx frontLeft;
+    public DcMotorEx backRight;
+    public DcMotorEx frontRight;
+    public DcMotorEx backLeft;
+    public DcMotorEx frontLeft;
+
+    public CRServo duckMech;
+
+    public DcMotorEx slides;
+
+    int startingSlidePos;
+    boolean isPressed = false;
 
     public enum DriveMode{
         SQUARED,
@@ -26,6 +37,7 @@ public abstract class OmegaTeleop extends OpMode {
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
+
 
         backRight = hardwareMap.get(DcMotorEx.class, "back_right");
         frontRight = hardwareMap.get(DcMotorEx.class, "front_right");
@@ -41,12 +53,35 @@ public abstract class OmegaTeleop extends OpMode {
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        slides = hardwareMap.get(DcMotorEx.class, "slides");
+
+        slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slides.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        startingSlidePos = slides.getCurrentPosition();
+
+        //duckMech = hardwareMap.get(CRServo.class, "duck_mechanism");
+        //duckMech.setDirection(DcMotorSimple.Direction.FORWARD);
+        //duckMech.setPower(0);
+        telemetry.addData("slides pos", slides.getCurrentPosition());
     }
 
     @Override
     public void loop() {
         intake();
-        drive(2, DriveMode.NORMAL);
+        drive(2, getCurrentMode());
+        //duckMech();
+        slides();
+        telemetry.addData("starting pos: ", startingSlidePos);
+        telemetry.addData("slides pos: ", slides.getCurrentPosition());
+        telemetry.addData("target pos: ", slides.getTargetPosition());
+        telemetry.update();
     }
 
     abstract public DriveMode getCurrentMode();
@@ -119,16 +154,47 @@ public abstract class OmegaTeleop extends OpMode {
     }
 
     public void intake(){
-        if(gamepad1.right_bumper){
-            intake.setPower(0.8);
-        } else if(gamepad1.left_bumper){
+        if(gamepad2.right_bumper){
+            intake.setPower(0.55);
+        } else if(gamepad2.left_bumper){
             intake.setPower(-0.3);
         } else {
             intake.setPower(0);
         }
+    }
 
-        if(gamepad1.a){
-            intake.setPower(0.2);
+    public void slides(){
+        if(gamepad2.dpad_right){
+            isPressed = true;
+            while(isPressed){
+                slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                slides.setTargetPosition(1200);
+                slides.setPower(0.4);
+                if(gamepad2.dpad_right) isPressed = false;
+            }
+        } else {
+            slides.setPower(0);
+        }
+        /*if(gamepad2.dpad_right){
+            slides.setTargetPosition(1200);
+            slides.setPower(0.3);
+            slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
+        if(gamepad2.dpad_left){
+            slides.setTargetPosition(50);
+            slides.setPower(-0.3);
+            slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }*/
+    }
+
+    public void duckMech(){
+        if(gamepad1.x){
+            duckMech.setPower(0.5);
+        }
+        else if(gamepad1.y){
+            duckMech.setPower(-0.5);
+        } else {
+            duckMech.setPower(0);
         }
     }
 }
