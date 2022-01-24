@@ -1,10 +1,6 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.hardware.Robot;
@@ -118,13 +114,11 @@ public abstract class OmegaTeleopModular extends OpMode {
     }
 
     public void slides(){
-        if(gamepad2.dpad_right){
-            boolean isPressed = true;
-            while(isPressed){
-                robot.slides.dropOffHigh();
-                if(gamepad2.dpad_right) break;
-            }
-        } else {
+        if(gamepad2.dpad_up){
+            robot.slides.dropOffHigh();
+        } else if (gamepad2.dpad_right) {
+            robot.slides.dropOffMiddle();
+        } else if (gamepad2.dpad_down){
             robot.slides.pickUp();
         }
     }
