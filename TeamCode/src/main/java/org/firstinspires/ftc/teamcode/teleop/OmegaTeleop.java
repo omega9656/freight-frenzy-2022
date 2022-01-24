@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.R;
 
@@ -22,8 +23,9 @@ public abstract class OmegaTeleop extends OpMode {
 
     public DcMotorEx slides;
 
+    public Servo trayTilt;
+
     int startingSlidePos;
-    boolean isPressed = false;
 
     public enum DriveMode{
         SQUARED,
@@ -64,23 +66,32 @@ public abstract class OmegaTeleop extends OpMode {
         slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slides.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        startingSlidePos = slides.getCurrentPosition();
+        trayTilt = hardwareMap.get(Servo.class, "tray_tilt");
+        trayTilt.setDirection(Servo.Direction.REVERSE);
+        trayTilt.setPosition(0.1);
 
-        //duckMech = hardwareMap.get(CRServo.class, "duck_mechanism");
-        //duckMech.setDirection(DcMotorSimple.Direction.FORWARD);
-        //duckMech.setPower(0);
+
+        duckMech = hardwareMap.get(CRServo.class, "duck_mechanism");
+        duckMech.setDirection(DcMotorSimple.Direction.FORWARD);
         telemetry.addData("slides pos", slides.getCurrentPosition());
+        telemetry.addData("tray pos", trayTilt.getPosition());
+
+        //trayTilt.scaleRange();
     }
 
     @Override
     public void loop() {
         intake();
         drive(2, getCurrentMode());
-        //duckMech();
+        duckMech();
         slides();
+        tilt();
+
         telemetry.addData("starting pos: ", startingSlidePos);
         telemetry.addData("slides pos: ", slides.getCurrentPosition());
         telemetry.addData("target pos: ", slides.getTargetPosition());
+
+        telemetry.addData("tray pos", trayTilt.getPosition());
         telemetry.update();
     }
 
@@ -155,7 +166,7 @@ public abstract class OmegaTeleop extends OpMode {
 
     public void intake(){
         if(gamepad2.right_bumper){
-            intake.setPower(0.55);
+            intake.setPower(0.40);
         } else if(gamepad2.left_bumper){
             intake.setPower(-0.3);
         } else {
@@ -163,15 +174,22 @@ public abstract class OmegaTeleop extends OpMode {
         }
     }
 
+    public void tilt(){
+        if(gamepad2.x){
+            trayTilt.setDirection(Servo.Direction.FORWARD);
+            trayTilt.setPosition(0.5);
+        }
+        else if(gamepad2.y){
+            //trayTilt.setDirection(Servo.Direction.REVERSE);
+            trayTilt.setPosition(0);
+        }
+    }
+
     public void slides(){
         if(gamepad2.dpad_right){
-            isPressed = true;
-            while(isPressed){
-                slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                slides.setTargetPosition(1200);
-                slides.setPower(0.4);
-                if(gamepad2.dpad_right) isPressed = false;
-            }
+            slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            slides.setTargetPosition(1586);
+            slides.setPower(0.4);
         } else {
             slides.setPower(0);
         }
@@ -188,12 +206,9 @@ public abstract class OmegaTeleop extends OpMode {
     }
 
     public void duckMech(){
-        if(gamepad1.x){
-            duckMech.setPower(0.5);
-        }
-        else if(gamepad1.y){
-            duckMech.setPower(-0.5);
-        } else {
+        if(gamepad2.dpad_down){
+            duckMech.setPower(1);
+        }else {
             duckMech.setPower(0);
         }
     }
