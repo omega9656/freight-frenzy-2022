@@ -7,10 +7,6 @@ import org.firstinspires.ftc.teamcode.hardware.Robot;
 
 public abstract class OmegaTeleopModular extends OpMode {
     Robot robot;
-    ElapsedTime time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-
-    final int RUN_MILLS = 1500;
-    final int RUN_MILLISECONDS = 1000;
 
     public enum DriveMode {
         SQUARED,
@@ -24,7 +20,6 @@ public abstract class OmegaTeleopModular extends OpMode {
     public void init() {
         robot = new Robot(hardwareMap);
         robot.init(false);
-        time.reset();
     }
 
     @Override
