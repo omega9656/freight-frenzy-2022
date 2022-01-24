@@ -2,13 +2,14 @@ package org.firstinspires.ftc.teamcode.hardware;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class Drivetrain {
 
-    DcMotorEx backRight;
-    DcMotorEx frontRight;
-    DcMotorEx backLeft;
-    DcMotorEx frontLeft;
+    public DcMotorEx backRight;
+    public DcMotorEx frontRight;
+    public DcMotorEx backLeft;
+    public DcMotorEx frontLeft;
 
     /***
      * initializes motors with hardware from DeviceManager
@@ -29,5 +30,9 @@ public class Drivetrain {
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 }
