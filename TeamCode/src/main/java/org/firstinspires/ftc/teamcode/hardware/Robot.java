@@ -1,10 +1,18 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
+import android.transition.Slide;
+
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Robot {
-
     public DeviceManager deviceManager;
+
+    public Drivetrain drivetrain;
+
+    public Slides slides;
+    public DuckMech duckMech;
+    public TrayTilt trayTilt;
+    public Intake intake;
 
     /***
      * takes hardware map from OpMode and creates deviceManager object
@@ -18,7 +26,16 @@ public class Robot {
      * initializes subassemblies using a DeviceManager
      * @param autoRunning - checks if auto is running to initialize wheels or not
      */
-    void init(boolean autoRunning){
+    public void init(boolean autoRunning){
         deviceManager.init(autoRunning);
+
+        if (!autoRunning) {
+            drivetrain = new Drivetrain(deviceManager);
+        }
+
+        intake = new Intake(deviceManager);
+        slides = new Slides(deviceManager);
+        duckMech = new DuckMech(deviceManager);
+        trayTilt = new TrayTilt(deviceManager);
     }
 }

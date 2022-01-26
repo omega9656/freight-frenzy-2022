@@ -5,20 +5,23 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import javax.sql.StatementEvent;
+
 public class DeviceManager {
-    DcMotorEx backRight;
-    DcMotorEx frontRight;
-    DcMotorEx backLeft;
-    DcMotorEx frontLeft;
+    public DcMotorEx backRight;
+    public DcMotorEx frontRight;
+    public DcMotorEx backLeft;
+    public DcMotorEx frontLeft;
 
-    DcMotorEx slides;
-    Servo dump;
+    public DcMotorEx slides;
+    public Servo dump;
 
-    DcMotorEx intake;
+    public DcMotorEx intake;
 
-    CRServo duckMech;
+    public CRServo duckMech;
 
-    HardwareMap hardwareMap;
+    public HardwareMap hardwareMap;
+    public Servo trayTilt;
 
     /***
      *
@@ -33,17 +36,20 @@ public class DeviceManager {
      * @param autoRunning - indicates whether auto is running so we don't initialize our drive motors
      */
     void init(boolean autoRunning){
-        backRight = hardwareMap.get(DcMotorEx.class, "back_right");
-        frontRight = hardwareMap.get(DcMotorEx.class, "front_right");
-        backLeft = hardwareMap.get(DcMotorEx.class, "back_left");
-        frontLeft = hardwareMap.get(DcMotorEx.class, "front_left");
+        if (!autoRunning) {
+            backRight = hardwareMap.get(DcMotorEx.class, "back_right");
+            frontRight = hardwareMap.get(DcMotorEx.class, "front_right");
+            backLeft = hardwareMap.get(DcMotorEx.class, "back_left");
+            frontLeft = hardwareMap.get(DcMotorEx.class, "front_left");
+        }
 
         slides = hardwareMap.get(DcMotorEx.class, "slides");
-        dump = hardwareMap.get(Servo.class, "dump");
+        trayTilt = hardwareMap.get(Servo.class, "tray_tilt");
 
         intake = hardwareMap.get(DcMotorEx.class, "intake");
 
         duckMech = hardwareMap.get(CRServo.class, "duck_mechanism");
+
     }
 
 }
