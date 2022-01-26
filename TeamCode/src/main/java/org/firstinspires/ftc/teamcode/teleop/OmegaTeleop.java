@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+import android.provider.FontRequest;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -7,10 +9,19 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.R;
 
 public abstract class OmegaTeleop extends OpMode {
+
+    ElapsedTime time = new ElapsedTime();
+    boolean isPressed = false;
+
+    public static final int TOP_SLIDE_POS = 1529;
+    public static final int MID_SLIDE_POS = 969;
+    public static final int LOW_SLIDE_POS = 658;
 
     public DcMotorEx intake;
 
@@ -19,7 +30,7 @@ public abstract class OmegaTeleop extends OpMode {
     public DcMotorEx backLeft;
     public DcMotorEx frontLeft;
 
-    public CRServo duckMech;
+    public DcMotorEx duckMech;
 
     public DcMotorEx slides;
 
@@ -62,20 +73,23 @@ public abstract class OmegaTeleop extends OpMode {
 
         slides = hardwareMap.get(DcMotorEx.class, "slides");
 
-        slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        startingSlidePos = slides.getCurrentPosition();
+        slides.setTargetPosition(startingSlidePos);
+        slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slides.setDirection(DcMotorSimple.Direction.REVERSE);
 
         trayTilt = hardwareMap.get(Servo.class, "tray_tilt");
         trayTilt.setDirection(Servo.Direction.REVERSE);
-        trayTilt.setPosition(0.1);
+        trayTilt.setPosition(0.35);
 
 
-        duckMech = hardwareMap.get(CRServo.class, "duck_mechanism");
-        duckMech.setDirection(DcMotorSimple.Direction.FORWARD);
+        duckMech = hardwareMap.get(DcMotorEx.class, "duck_mech");
+        duckMech.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         telemetry.addData("slides pos", slides.getCurrentPosition());
         telemetry.addData("tray pos", trayTilt.getPosition());
-
         //trayTilt.scaleRange();
     }
 
@@ -86,6 +100,8 @@ public abstract class OmegaTeleop extends OpMode {
         duckMech();
         slides();
         tilt();
+        dropOff(TOP_SLIDE_POS);
+
 
         telemetry.addData("starting pos: ", startingSlidePos);
         telemetry.addData("slides pos: ", slides.getCurrentPosition());
@@ -165,51 +181,75 @@ public abstract class OmegaTeleop extends OpMode {
     }
 
     public void intake(){
-        if(gamepad2.right_bumper){
-            intake.setPower(0.40);
-        } else if(gamepad2.left_bumper){
+        if(gamepad2.right_trigger > 0.3){
+            intake.setPower(0.6);
+        } else if(gamepad2.left_trigger > 0.3){
             intake.setPower(-0.3);
         } else {
             intake.setPower(0);
         }
     }
 
+    // POSITION 1 is level 2 when FORWARD
+    // POSITION 1 is parallel when REVERSE
+    // POSITION 0.1 is right drop position for LEVEL 2 when REVERSE
     public void tilt(){
-        if(gamepad2.x){
-            trayTilt.setDirection(Servo.Direction.FORWARD);
-            trayTilt.setPosition(0.5);
-        }
-        else if(gamepad2.y){
-            //trayTilt.setDirection(Servo.Direction.REVERSE);
-            trayTilt.setPosition(0);
+        if(gamepad2.x){ // PARALLEL
+            trayTilt.setPosition(.45);
+        } else if(gamepad2.a){
+            trayTilt.setPosition(0.75);
+        } else if(gamepad2.b){
+            trayTilt.setPosition(0.35);
         }
     }
 
     public void slides(){
-        if(gamepad2.dpad_right){
+        if(gamepad2.dpad_up){
+            slides.setTargetPosition(TOP_SLIDE_POS);
             slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            slides.setTargetPosition(1586);
             slides.setPower(0.4);
-        } else {
-            slides.setPower(0);
-        }
-        /*if(gamepad2.dpad_right){
-            slides.setTargetPosition(1200);
-            slides.setPower(0.3);
+        } else if(gamepad2.dpad_right){
+            slides.setTargetPosition(MID_SLIDE_POS);
             slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        }
-        if(gamepad2.dpad_left){
-            slides.setTargetPosition(50);
-            slides.setPower(-0.3);
+            slides.setPower(0.4);
+        } else if(gamepad2.dpad_down){
+            slides.setTargetPosition(startingSlidePos);
+            slides.setDirection(DcMotorSimple.Direction.FORWARD);
             slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        }*/
+            slides.setPower(0.4);
+        }
+        else {
+            slides.setTargetPosition(slides.getCurrentPosition());
+            slides.setDirection(DcMotorSimple.Direction.REVERSE);
+        }
     }
 
     public void duckMech(){
-        if(gamepad2.dpad_down){
-            duckMech.setPower(1);
-        }else {
-            duckMech.setPower(0);
+        if(gamepad1.b){
+            time.reset();
+            while(time.milliseconds() < 600){
+                duckMech.setVelocity(-0.3* Math.PI, AngleUnit.RADIANS);
+            }
+            time.reset();
+            while(time.milliseconds() < 200){
+                drive(2, getCurrentMode());
+                intake();
+                slides();
+                tilt();
+                telemetry.addData("velo duck: ", duckMech.getVelocity(AngleUnit.DEGREES));
+                duckMech.setVelocity(-0.45 * Math.PI, AngleUnit.RADIANS);
+            }
+            duckMech.setVelocity(0);
+        }
+    }
+
+    public void dropOff(int pos){
+        if(gamepad2.y){
+            trayTilt.setPosition(0.45);
+            slides.setPower(0.4);
+            slides.setDirection(DcMotorSimple.Direction.REVERSE);
+            slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            slides.setTargetPosition(pos);
         }
     }
 }

@@ -63,10 +63,10 @@ public class AutoCVWebcamVision extends LinearOpMode {
      *  FreightFrenzy_BC.tflite  0: Ball,  1: Cube
      *  FreightFrenzy_DM.tflite  0: Duck,  1: Marker
      */
-    private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
+    //private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Stone";
     private static final String LABEL_SECOND_ELEMENT = "Skystone";
-    //private static final String TFOD_MODEL_ASSET = "FreightFrenzy_BCDM.tflite";
+    private static final String TFOD_MODEL_ASSET = "FreightFrenzy_BCDM.tflite";
     private static final String[] LABELS = {
             "Ball",
             "Cube",
@@ -182,8 +182,9 @@ public class AutoCVWebcamVision extends LinearOpMode {
         tfodParameters.minResultConfidence = 0.8f;
         tfodParameters.isModelTensorFlow2 = true;
         tfodParameters.inputSize = 320;
+        //tfodParameters.
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
     }
 }
 

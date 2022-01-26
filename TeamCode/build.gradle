@@ -23,3 +23,7 @@ dependencies {
 
     implementation 'com.acmerobotics.roadrunner:core:0.5.4'
 }
+
+dependencies {
+    implementation 'org.openftc:easyopencv:1.5.1'
+}
