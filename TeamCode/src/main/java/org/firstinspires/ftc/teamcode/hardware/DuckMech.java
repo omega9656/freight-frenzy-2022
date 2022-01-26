@@ -5,38 +5,37 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class DuckMech {
-    CRServo duckMech;
-    ServoPower currentPower;
+    DcMotorEx duckMech;
+    Power currentPower;
 
 //    public boolean servoIsOn = false;
 
-    public enum ServoPower {
+    public enum Power {
         FORWARDS(0.5),
         STOPPED(0);
 
         public double power;
 
-        ServoPower(double power) {
+        Power(double power) {
             this.power = power;
         }
     }
 
-    public void run(ServoPower servoPower) {
-        duckMech.setPower(servoPower.power);
-        currentPower = servoPower;
+    public void run(Power power) {
+        duckMech.setPower(power.power);
+        currentPower = power;
     }
 
     public DuckMech(DeviceManager deviceManager) {
-        currentPower = ServoPower.STOPPED;
-
+        currentPower = Power.STOPPED;
         duckMech = deviceManager.duckMech;
     }
 
     public void spin() {
-        run(ServoPower.FORWARDS);
+        run(Power.FORWARDS);
     }
 
     public void stop() {
-        run(ServoPower.STOPPED);
+        run(Power.STOPPED);
     }
 }

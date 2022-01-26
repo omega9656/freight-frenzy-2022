@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 
+
 public abstract class OmegaTeleopModular extends OpMode {
     Robot robot;
 
@@ -131,6 +132,12 @@ public abstract class OmegaTeleopModular extends OpMode {
             robot.duckMech.spin();
         } else {
             robot.duckMech.stop();
+        }
+    }
+
+    public void dropOff(){
+        if(gamepad2.y){
+
         }
     }
 }

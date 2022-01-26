@@ -14,11 +14,10 @@ public class DeviceManager {
     public DcMotorEx frontLeft;
 
     public DcMotorEx slides;
-    public Servo dump;
 
     public DcMotorEx intake;
 
-    public CRServo duckMech;
+    public DcMotorEx duckMech;
 
     public HardwareMap hardwareMap;
     public Servo trayTilt;
@@ -48,7 +47,7 @@ public class DeviceManager {
 
         intake = hardwareMap.get(DcMotorEx.class, "intake");
 
-        duckMech = hardwareMap.get(CRServo.class, "duck_mechanism");
+        duckMech = hardwareMap.get(DcMotorEx.class, "duck_mech");
 
     }
 

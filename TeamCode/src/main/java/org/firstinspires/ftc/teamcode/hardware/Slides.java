@@ -8,11 +8,11 @@ public class Slides {
     DcMotorEx slides;
     Position currentPos;
 
-    public static final double maxPower = 0.1;
+    public static final double maxPower = 0.4;
 
     public enum Position {
-        DROP_OFF_HIGH(500),
-        DROP_OFF_MIDDLE(200),
+        DROP_OFF_HIGH(1529),
+        DROP_OFF_MIDDLE(969),
         PICKUP(0); //picking up game elements
 
         public int armPosition;
