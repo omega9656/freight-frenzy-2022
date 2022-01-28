@@ -3,45 +3,47 @@ package org.firstinspires.ftc.teamcode.hardware;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
 public class Intake {
-    MotorPower currentPower; //declaring MotorPower
+    MotorVelocity currentVelocity;
     public DcMotorEx intake; //declaring Intake
 
     public Intake(DeviceManager deviceManager) {
         intake = deviceManager.intake;
 
-        intake.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER); // when ran, ran without encoder?
+        intake.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER); // when ran, ran without encoder?
         intake.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE); // when power is 0, BRAKE
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
-        currentPower = MotorPower.STOP; // default power is at STOP(0)
+        currentVelocity = MotorVelocity.STOP; // default power is at STOP(0)
     }
-    public enum MotorPower {
-        // set the power for the intake at different states
-        IN(0.4),
-        OUT(-0.3),
+    public enum MotorVelocity {
+        // set the velocities for the intake at different states
+        IN(128),
+        OUT(-90),
         STOP(0);
 
-        public double intakePower;
+        public double intakeSpeed;
 
-        MotorPower(double intakePower) {
-            this.intakePower = intakePower;
+        MotorVelocity(double intakeSpeed) {
+            this.intakeSpeed = intakeSpeed;
         }
     }
 
-    public void run(MotorPower motorPower){
-        intake.setPower(motorPower.intakePower);
-        currentPower = motorPower;
+    public void run(MotorVelocity motorVelocity){
+        intake.setVelocity(motorVelocity.intakeSpeed, AngleUnit.DEGREES);
+        this.currentVelocity = motorVelocity;
     }
 
     public void in(){
-        run(MotorPower.IN); //calling the run method for the IN power
+        run(MotorVelocity.IN); //calling the run method for the IN power
     }
     public void out(){
-        run(MotorPower.OUT); //calling the run method for the OUT power
+        run(MotorVelocity.OUT); //calling the run method for the OUT power
     }
     public void stop(){
-        run(MotorPower.STOP); //calling the run method for the STOP power
+        run(MotorVelocity.STOP); //calling the run method for the STOP power
     }
 }

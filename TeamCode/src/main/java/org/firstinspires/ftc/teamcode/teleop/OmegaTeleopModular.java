@@ -109,11 +109,11 @@ public abstract class OmegaTeleopModular extends OpMode {
 
     public void intake(){
         if(gamepad2.right_trigger > 0.3){
-            robot.intake.intake.setVelocity(128, AngleUnit.DEGREES);
+            robot.intake.in();
         } else if(gamepad2.left_trigger > 0.3){
-            robot.intake.intake.setVelocity(-90, AngleUnit.DEGREES);
+            robot.intake.out();
         } else {
-            robot.intake.intake.setVelocity(0);
+            robot.intake.stop();
         }
     }
 
