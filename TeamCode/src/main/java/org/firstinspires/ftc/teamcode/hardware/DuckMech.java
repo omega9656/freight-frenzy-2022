@@ -1,14 +1,23 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class DuckMech {
-    DcMotorEx duckMech;
+    public DcMotorEx duckMech;
     Power currentPower;
 
-//    public boolean servoIsOn = false;
+    ElapsedTime time = new ElapsedTime();
+
+
+    // degrees / sec
+    public final double INITIAL_VELO = 15;
+    public final double ACCEL = 25;
 
     public enum Power {
         FORWARDS(0.5),
@@ -29,6 +38,7 @@ public class DuckMech {
     public DuckMech(DeviceManager deviceManager) {
         currentPower = Power.STOPPED;
         duckMech = deviceManager.duckMech;
+        duckMech.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void spin() {
@@ -37,5 +47,13 @@ public class DuckMech {
 
     public void stop() {
         run(Power.STOPPED);
+    }
+
+    public void optimalSpin(){
+        time.reset();
+        while(time.milliseconds() < 2000){
+            duckMech.setVelocity(INITIAL_VELO + (time.seconds() * ACCEL), AngleUnit.DEGREES);
+        }
+        duckMech.setVelocity(0);
     }
 }

@@ -5,14 +5,15 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class Slides {
-    DcMotorEx slides;
+    public DcMotorEx slides;
     Position currentPos;
 
-    public static final double maxPower = 0.4;
+    public static final double maxPower = 0.6;
 
+    // 806 1st
     public enum Position {
-        DROP_OFF_HIGH(1529),
-        DROP_OFF_MIDDLE(969),
+        DROP_OFF_HIGH(1530),
+        DROP_OFF_MIDDLE(1128),
         PICKUP(0); //picking up game elements
 
         public int armPosition;

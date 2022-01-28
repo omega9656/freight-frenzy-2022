@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class Intake {
     MotorPower currentPower; //declaring MotorPower
-    DcMotorEx intake; //declaring Intake
+    public DcMotorEx intake; //declaring Intake
 
     public Intake(DeviceManager deviceManager) {
         intake = deviceManager.intake;

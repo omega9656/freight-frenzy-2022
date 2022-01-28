@@ -3,10 +3,12 @@ package org.firstinspires.ftc.teamcode.teleop;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 
 
 public abstract class OmegaTeleopModular extends OpMode {
+    ElapsedTime time = new ElapsedTime();
     Robot robot;
 
     public enum DriveMode {
@@ -28,8 +30,14 @@ public abstract class OmegaTeleopModular extends OpMode {
         intake();
         drive(2, getCurrentMode());
         duckMech();
-        slides();
+        //slides();
+        dropHeight();
+        down();
         tray();
+        telemetry.addData("duck mech velo: ", robot.duckMech.duckMech.getVelocity(AngleUnit.DEGREES));
+        telemetry.addData("slides pos", robot.slides.slides.getCurrentPosition());
+        telemetry.addData("tray pos", robot.trayTilt.trayTilt.getPosition());
+        telemetry.addData("intake velo", robot.intake.intake.getVelocity(AngleUnit.DEGREES));
     }
 
     public void drive(double strafe, DriveMode driveMode) {
@@ -100,44 +108,61 @@ public abstract class OmegaTeleopModular extends OpMode {
     }
 
     public void intake(){
-        if(gamepad2.right_bumper){
-            robot.intake.in();
-        } else if(gamepad2.left_bumper){
-            robot.intake.out();
+        if(gamepad2.right_trigger > 0.3){
+            robot.intake.intake.setVelocity(128, AngleUnit.DEGREES);
+        } else if(gamepad2.left_trigger > 0.3){
+            robot.intake.intake.setVelocity(-90, AngleUnit.DEGREES);
         } else {
-            robot.intake.stop();
+            robot.intake.intake.setVelocity(0);
         }
     }
 
-    public void slides(){
-        if(gamepad2.dpad_up){
-            robot.slides.dropOffHigh();
-        } else if (gamepad2.dpad_right) {
-            robot.slides.dropOffMiddle();
-        } else if (gamepad2.dpad_down){
-            robot.slides.pickUp();
-        }
-    }
+//    public void slides(){
+//        if(gamepad2.dpad_down){
+//            robot.slides.pickUp();
+//        }
+//    }
 
     public void tray() {
-        if (gamepad1.x) {
-            robot.trayTilt.tilt();
-        } else if (gamepad1.y) {
+        if (gamepad2.b) {
             robot.trayTilt.ready();
+        } else if(gamepad2.a){
+            robot.trayTilt.tilt();
+        } else if(gamepad2.y){
+            robot.trayTilt.parallel();
         }
     }
 
     public void duckMech(){
-        if(gamepad1.x){
-            robot.duckMech.spin();
-        } else {
-            robot.duckMech.stop();
+        if(gamepad2.right_bumper){
+            robot.duckMech.optimalSpin();
         }
     }
 
-    public void dropOff(){
-        if(gamepad2.y){
+    public void dropHeight(){
+        if(gamepad2.dpad_up){
+            robot.trayTilt.parallel();
+            robot.slides.dropOffHigh();
+        }
+        if(gamepad2.dpad_right){
+            robot.trayTilt.parallel();
+            robot.slides.dropOffMiddle();
+        }
+    }
 
+    public void down(){
+        if(gamepad2.dpad_down){
+            time.reset();
+            while(time.milliseconds() < 1000){
+                drive(2, getCurrentMode());
+                robot.trayTilt.tilt();
+            }
+            robot.trayTilt.parallel();
+            robot.slides.pickUp();
+            while(robot.slides.slides.getCurrentPosition()-20 > robot.slides.slides.getTargetPosition()){
+                drive(2, getCurrentMode());
+            }
+            robot.trayTilt.ready();
         }
     }
 }

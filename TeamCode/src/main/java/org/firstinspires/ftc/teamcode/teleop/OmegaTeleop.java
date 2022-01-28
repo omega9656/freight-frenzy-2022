@@ -218,10 +218,6 @@ public abstract class OmegaTeleop extends OpMode {
             slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             slides.setPower(0.4);
         }
-        else {
-            slides.setTargetPosition(slides.getCurrentPosition());
-            slides.setDirection(DcMotorSimple.Direction.REVERSE);
-        }
     }
 
     public void duckMech(){

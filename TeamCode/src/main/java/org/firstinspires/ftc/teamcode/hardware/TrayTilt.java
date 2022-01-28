@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.hardware;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class TrayTilt {
-    Servo trayTilt;
+    public Servo trayTilt;
     Position currentMode;
 
 //    public static double degreesToServoPos(double angle) {
@@ -14,7 +14,7 @@ public class TrayTilt {
 //        INTAKING(0.0),
 //        SLIDING(0.1),
 //        OUTTAKING(0.5);
-        INTAKING(0.37),
+        INTAKING(0.33),
         SLIDING(.45),
         OUTTAKING(0.75);
 
@@ -28,6 +28,7 @@ public class TrayTilt {
 
     public TrayTilt(DeviceManager deviceManager){
         trayTilt = deviceManager.trayTilt;
+        trayTilt.setDirection(Servo.Direction.REVERSE);
         trayTilt.setPosition(Position.INTAKING.tiltPosition);
     }
 
@@ -40,7 +41,7 @@ public class TrayTilt {
         run(Position.INTAKING);
     }
 
-    public void partialTilt() {
+    public void parallel() {
         run(Position.SLIDING);
     }
 
