@@ -33,7 +33,7 @@ public class PathTesting extends LinearOpMode {
     //private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
 
     // position of element (1, 2, 3)
-    private int pos;
+    private int pos = 1;
 
     private static final String LABEL_FIRST_ELEMENT = "Stone";
     private static final String LABEL_SECOND_ELEMENT = "Skystone";
@@ -82,8 +82,8 @@ public class PathTesting extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        initTfod();
         initVuforia();
+        initTfod();
 
         time  = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
@@ -92,7 +92,6 @@ public class PathTesting extends LinearOpMode {
         drive = new SampleMecanumDrive(hardwareMap);
         drive.setPoseEstimate(startPose);
 
-        waitForStart();
 
         if (tfod != null) {
             tfod.activate();
@@ -109,31 +108,45 @@ public class PathTesting extends LinearOpMode {
         /** Wait for the game to begin */
         telemetry.addData(">", "Press Play to start op mode");
         telemetry.update();
-        waitForStart();
 
-        if (opModeIsActive()) {
-            while (opModeIsActive()) {
-                if (tfod != null) {
-                    // getUpdatedRecognitions() will return null if no new information is available since
-                    // the last time that call was made.
-                    List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-                    if (updatedRecognitions != null) {
-                        telemetry.addData("# Object Detected", updatedRecognitions.size());
-                        // step through the list of recognitions and display boundary info.
-                        int i = 0;
-                        for (Recognition recognition : updatedRecognitions) {
-                            telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-                            telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
-                                    recognition.getLeft(), recognition.getTop());
-                            telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
-                                    recognition.getRight(), recognition.getBottom());
-                            i++;
-                        }
-                        telemetry.update();
+        while (!isStopRequested() && !opModeIsActive()) {
+            if (tfod != null) {
+                // getUpdatedRecognitions() will return null if no new information is available since
+                // the last time that call was made.
+                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+                if (updatedRecognitions != null) {
+                    telemetry.addData("# Object Detected", updatedRecognitions.size());
+                    if(updatedRecognitions.size() == 0){
+                        pos = 1;
                     }
+                    // step through the list of recognitions and display boundary info.
+                    int i = 0;
+                    for (Recognition recognition : updatedRecognitions) {
+
+                        if(recognition.getLabel().equals("Cube")){
+                            if(recognition.getLeft() < 200 && recognition.getTop() < 210){
+                                pos = 2;
+                            } else if(recognition.getLeft() < 450 && recognition.getTop() < 210){
+                                pos = 3;
+                            } else {
+                                pos = 0;
+                            }
+                        }
+                        telemetry.addData("DUCK POSITION IN LEVEL ", pos);
+
+                        telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+                        telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
+                                recognition.getLeft(), recognition.getTop());
+                        telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
+                                recognition.getRight(), recognition.getBottom());
+                        i++;
+                    }
+                    telemetry.update();
                 }
             }
         }
+
+        waitForStart();
 
         if(opModeIsActive() && !isStopRequested()){
             executeAutoPath();
@@ -175,8 +188,13 @@ public class PathTesting extends LinearOpMode {
 
         drive.followTrajectory(offWall);
 
-        robot.trayTilt.parallel();
-        robot.slides.dropOffHigh();
+        if(pos == 3){
+            robot.slides.dropOffHigh();
+        } else if(pos == 2){
+            robot.slides.dropOffMiddle();
+        } else {
+            robot.slides.dropOffLow();
+        }
 
         drive.followTrajectory(strafeHub);
         drive.followTrajectory(forwardHub);

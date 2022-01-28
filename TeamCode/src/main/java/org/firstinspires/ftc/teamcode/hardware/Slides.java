@@ -14,6 +14,7 @@ public class Slides {
     public enum Position {
         DROP_OFF_HIGH(1530),
         DROP_OFF_MIDDLE(1128),
+        DROP_OFF_BOTTOM(806),
         PICKUP(0); //picking up game elements
 
         public int armPosition;
@@ -53,8 +54,14 @@ public class Slides {
     public void dropOffMiddle(){
         run(Position.DROP_OFF_MIDDLE);
     }
+
+    // sets arm to level 1 position
+    public void dropOffLow() {
+        run(Position.DROP_OFF_BOTTOM);
+    }
     //sets arm to 'pick up' position
     public void pickUp(){
         run(Position.PICKUP);
     }
+
 }

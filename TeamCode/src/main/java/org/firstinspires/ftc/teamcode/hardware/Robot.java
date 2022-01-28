@@ -36,6 +36,6 @@ public class Robot {
         intake = new Intake(deviceManager);
         slides = new Slides(deviceManager);
         duckMech = new DuckMech(deviceManager);
-        trayTilt = new TrayTilt(deviceManager);
+        trayTilt = new TrayTilt(deviceManager, autoRunning);
     }
 }

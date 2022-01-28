@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
+import android.content.pm.SharedLibraryInfo;
+
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class TrayTilt {
@@ -26,10 +28,15 @@ public class TrayTilt {
 
     }
 
-    public TrayTilt(DeviceManager deviceManager){
+    public TrayTilt(DeviceManager deviceManager, boolean autoIsRunning){
         trayTilt = deviceManager.trayTilt;
         trayTilt.setDirection(Servo.Direction.REVERSE);
-        trayTilt.setPosition(Position.INTAKING.tiltPosition);
+        if(autoIsRunning) {
+            trayTilt.setPosition(Position.SLIDING.tiltPosition);
+        }
+        else {
+            trayTilt.setPosition(Position.INTAKING.tiltPosition);
+        }
     }
 
     public void run(Position position){

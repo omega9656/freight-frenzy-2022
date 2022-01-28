@@ -16,8 +16,8 @@ public class DuckMech {
 
 
     // degrees / sec
-    public final double INITIAL_VELO = 15;
-    public final double ACCEL = 25;
+    public final double INITIAL_VELO = 12;
+    public final double ACCEL = 22;
 
     public enum Power {
         FORWARDS(0.5),
@@ -51,7 +51,7 @@ public class DuckMech {
 
     public void optimalSpin(){
         time.reset();
-        while(time.milliseconds() < 2000){
+        while(time.milliseconds() < 2750){
             duckMech.setVelocity(INITIAL_VELO + (time.seconds() * ACCEL), AngleUnit.DEGREES);
         }
         duckMech.setVelocity(0);
