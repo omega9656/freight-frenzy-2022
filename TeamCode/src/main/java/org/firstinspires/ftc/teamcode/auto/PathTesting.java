@@ -171,19 +171,19 @@ public class PathTesting extends LinearOpMode {
                 .build();
 
         Trajectory backToDuck = drive.trajectoryBuilder(frontWall.end().plus(new Pose2d(0, 0, Math.toRadians(-90))))
-                .forward(44)
+                .forward(43) // 44
                 .build();
 
         Trajectory parkWarehouseHalf = drive.trajectoryBuilder(backToDuck.end())
-                .back(50)
+                .back(48) // 50
                 .build();
 
-        Trajectory strafeWall = drive.trajectoryBuilder(parkWarehouseHalf.end())
-                .strafeLeft(8)
+        Trajectory strafeWall = drive.trajectoryBuilder(parkWarehouseHalf.end().plus(new Pose2d(0,0, Math.toRadians(180))))
+                .strafeRight(8)
                 .build();
 
         Trajectory park = drive.trajectoryBuilder(strafeWall.end())
-                .back(45)
+                .forward(45)
                 .build();
 
         drive.followTrajectory(offWall);
@@ -213,6 +213,7 @@ public class PathTesting extends LinearOpMode {
         drive.followTrajectory(backToDuck);
         robot.duckMech.optimalSpin();
         drive.followTrajectory(parkWarehouseHalf);
+        drive.turn(Math.toRadians(180));
         drive.followTrajectory(strafeWall);
         drive.followTrajectory(park);
 

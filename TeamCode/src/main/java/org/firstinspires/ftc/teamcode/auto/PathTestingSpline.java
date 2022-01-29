@@ -34,9 +34,6 @@ public class PathTestingSpline extends LinearOpMode {
 
     // position of element (1, 2, 3)
     private int pos;
-
-    private static final String LABEL_FIRST_ELEMENT = "Stone";
-    private static final String LABEL_SECOND_ELEMENT = "Skystone";
     private static final String TFOD_MODEL_ASSET = "FreightFrenzy_BCDM.tflite";
     private static final String[] LABELS = {
             "Ball",
@@ -82,8 +79,8 @@ public class PathTestingSpline extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        initTfod();
         initVuforia();
+        initTfod();
 
         time  = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
@@ -92,7 +89,6 @@ public class PathTestingSpline extends LinearOpMode {
         drive = new SampleMecanumDrive(hardwareMap);
         drive.setPoseEstimate(startPose);
 
-        waitForStart();
 
         if (tfod != null) {
             tfod.activate();
@@ -109,31 +105,45 @@ public class PathTestingSpline extends LinearOpMode {
         /** Wait for the game to begin */
         telemetry.addData(">", "Press Play to start op mode");
         telemetry.update();
-        waitForStart();
 
-        if (opModeIsActive()) {
-            while (opModeIsActive()) {
-                if (tfod != null) {
-                    // getUpdatedRecognitions() will return null if no new information is available since
-                    // the last time that call was made.
-                    List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-                    if (updatedRecognitions != null) {
-                        telemetry.addData("# Object Detected", updatedRecognitions.size());
-                        // step through the list of recognitions and display boundary info.
-                        int i = 0;
-                        for (Recognition recognition : updatedRecognitions) {
-                            telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-                            telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
-                                    recognition.getLeft(), recognition.getTop());
-                            telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
-                                    recognition.getRight(), recognition.getBottom());
-                            i++;
-                        }
-                        telemetry.update();
+        while (!isStopRequested() && !opModeIsActive()) {
+            if (tfod != null) {
+                // getUpdatedRecognitions() will return null if no new information is available since
+                // the last time that call was made.
+                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+                if (updatedRecognitions != null) {
+                    telemetry.addData("# Object Detected", updatedRecognitions.size());
+                    if(updatedRecognitions.size() == 0){
+                        pos = 1;
                     }
+                    // step through the list of recognitions and display boundary info.
+                    int i = 0;
+                    for (Recognition recognition : updatedRecognitions) {
+
+                        if(recognition.getLabel().equals("Cube")){
+                            if(recognition.getLeft() < 200 && recognition.getTop() < 210){
+                                pos = 2;
+                            } else if(recognition.getLeft() < 450 && recognition.getTop() < 210){
+                                pos = 3;
+                            } else {
+                                pos = 0;
+                            }
+                        }
+                        telemetry.addData("DUCK POSITION IN LEVEL ", pos);
+
+                        telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+                        telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
+                                recognition.getLeft(), recognition.getTop());
+                        telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
+                                recognition.getRight(), recognition.getBottom());
+                        i++;
+                    }
+                    telemetry.update();
                 }
             }
         }
+
+        waitForStart();
 
         if(opModeIsActive() && !isStopRequested()){
             splinePaths();
@@ -203,10 +213,32 @@ public class PathTestingSpline extends LinearOpMode {
 
     public void splinePaths(){
         Trajectory t1 = drive.trajectoryBuilder(startPose)
-                .lineToConstantHeading(new Vector2d(22, 18))
+                .lineToConstantHeading(new Vector2d(-18, 22))
                 .build();
 
+        Trajectory t2 = drive.trajectoryBuilder(startPose)
+                .splineTo(new Vector2d(15.5, -46), Math.toRadians(-30))
+                .build();
+
+        Trajectory t3 = drive.trajectoryBuilder(startPose)
+                .splineTo(new Vector2d(4.5, 66), Math.toRadians(0))
+                .build();
+
+        Trajectory t4 = drive.trajectoryBuilder(t3.end())
+                .splineTo(new Vector2d(0, 0), Math.toRadians(0))
+                .build();
+
+        Trajectory t5 = drive.trajectoryBuilder(t4.end())
+                .splineTo(new Vector2d(1, 28), Math.toRadians(0))
+                .build();
+
+
+
         drive.followTrajectory(t1);
+        drive.followTrajectory(t2);
+        drive.followTrajectory(t3);
+        drive.followTrajectory(t4);
+        drive.followTrajectory(t5);
     }
 
     /**

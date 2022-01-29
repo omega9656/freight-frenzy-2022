@@ -22,7 +22,7 @@ public class Intake {
     public enum MotorVelocity {
         // set the velocities for the intake at different states
         IN(128),
-        OUT(-90),
+        OUT(-60),
         STOP(0);
 
         public double intakeSpeed;

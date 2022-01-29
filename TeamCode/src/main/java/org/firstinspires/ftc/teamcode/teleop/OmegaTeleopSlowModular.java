@@ -4,14 +4,17 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 
 
-public abstract class OmegaTeleopModular extends OpMode {
+public abstract class OmegaTeleopSlowModular extends OpMode {
     ElapsedTime time = new ElapsedTime();
     Robot robot;
 
-    public static double slow_multiplier = 0.3;
+    boolean stalled = false;
+
+    public static double slow_multiplier = 0.55;
 
     public enum DriveMode {
         SQUARED,
@@ -67,17 +70,17 @@ public abstract class OmegaTeleopModular extends OpMode {
         double frontRightPower = vertical - horizontal - rotate;
         double backRightPower = vertical + horizontal - rotate;
 
-//        if(gamepad2.left_trigger > 0.5) {
-//            slow_multiplier = 1;
-//        }
-//        else {
-//            slow_multiplier = 0.3;
-//        }
-//
-//        frontLeftPower *= slow_multiplier;
-//        backLeftPower *= slow_multiplier;
-//        frontRightPower *= slow_multiplier;
-//        backRightPower *= slow_multiplier;
+        if(gamepad1.left_trigger > 0.5) {
+            slow_multiplier = 1;
+        }
+        else {
+            slow_multiplier = 0.3;
+        }
+
+        frontLeftPower *= slow_multiplier;
+        backLeftPower *= slow_multiplier;
+        frontRightPower *= slow_multiplier;
+        backRightPower *= slow_multiplier;
 
         // if there is a power level that is out of range
         if (
@@ -137,13 +140,30 @@ public abstract class OmegaTeleopModular extends OpMode {
     }
 
     public void intake(){
+        final double STALL_CURRENT = 9.2;
+        final double WAIT_TIME = 500;
+
         if(gamepad2.right_trigger > 0.3){
             robot.intake.in();
         } else if(gamepad2.left_trigger > 0.3){
             robot.intake.out();
-        } else {
+        } else if(gamepad2.left_bumper){
+            robot.intake.in();
+            // if current surpasses or reaches stall current and not stalled, intakes out
+            if (robot.intake.intake.getCurrent(CurrentUnit.AMPS) >= STALL_CURRENT && !stalled) {
+                stalled = true;
+                robot.intake.out();
+                time.reset();
+                // if the time we run the intake outward is expired, stop the intake
+                if (time.milliseconds() > WAIT_TIME && stalled) {
+                    robot.intake.stop();
+                    stalled = false;
+                }
+            }
+        }  else {
             robot.intake.stop();
         }
+
     }
 
 //    public void slides(){
@@ -181,6 +201,10 @@ public abstract class OmegaTeleopModular extends OpMode {
         if(gamepad2.dpad_right){
             robot.trayTilt.parallel();
             robot.slides.dropOffMiddle();
+        }
+        if(gamepad2.dpad_left){
+            robot.trayTilt.parallel();
+            robot.slides.dropOffLow();
         }
     }
 
