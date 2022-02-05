@@ -1,14 +1,14 @@
-package org.firstinspires.ftc.teamcode.teleop;
+package org.firstinspires.ftc.teamcode.teleop.NonModular;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@TeleOp(name = "Cubed")
+@TeleOp(name = "Normal Drive")
 @Disabled
-public class Cubed extends OmegaTeleop{
+public class Normal extends OmegaTeleop {
 
     @Override
     public DriveMode getCurrentMode() {
-        return DriveMode.CUBED;
+        return DriveMode.NORMAL;
     }
 }

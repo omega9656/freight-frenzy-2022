@@ -14,7 +14,7 @@ public abstract class OmegaTeleopSlowModular extends OpMode {
 
     boolean stalled = false;
 
-    public static double slow_multiplier = 0.55;
+    public static double slow_multiplier = 0.3;
 
     public enum DriveMode {
         SQUARED,

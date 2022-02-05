@@ -1,11 +1,12 @@
-package org.firstinspires.ftc.teamcode.teleop;
+package org.firstinspires.ftc.teamcode.teleop.NonModular;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@TeleOp(name = "Squared")
+@TeleOp(name = "Cubed")
 @Disabled
-public class Squared extends OmegaTeleop{
+public class Cubed extends OmegaTeleop {
+
     @Override
     public DriveMode getCurrentMode() {
         return DriveMode.CUBED;

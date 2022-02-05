@@ -16,7 +16,6 @@ public class Intake {
         intake.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE); // when power is 0, BRAKE
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
-
         currentVelocity = MotorVelocity.STOP; // default power is at STOP(0)
     }
     public enum MotorVelocity {
