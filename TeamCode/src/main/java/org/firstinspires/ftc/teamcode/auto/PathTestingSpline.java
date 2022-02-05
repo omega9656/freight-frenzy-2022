@@ -74,7 +74,7 @@ public class PathTestingSpline extends LinearOpMode {
     Robot robot;
     SampleMecanumDrive drive;
 
-    Pose2d startPose = new Pose2d(0, 0, 0);
+    Pose2d startPose = new Pose2d(-32, -62, 270);
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -207,38 +207,39 @@ public class PathTestingSpline extends LinearOpMode {
         drive.followTrajectory(parkWarehouseHalf);
         drive.followTrajectory(strafeWall);
         drive.followTrajectory(park);
-
-
     }
 
+    // y - left right from door
+    // x - up down from door view
     public void splinePaths(){
         Trajectory t1 = drive.trajectoryBuilder(startPose)
-                .lineToConstantHeading(new Vector2d(-18, 22))
+                .lineToConstantHeading(new Vector2d(-10, -44))
                 .build();
 
         Trajectory t2 = drive.trajectoryBuilder(startPose)
-                .splineTo(new Vector2d(15.5, -46), Math.toRadians(-30))
+                .splineTo(new Vector2d(-50, -57), 0)
                 .build();
 
-        Trajectory t3 = drive.trajectoryBuilder(startPose)
-                .splineTo(new Vector2d(4.5, 66), Math.toRadians(0))
-                .build();
-
-        Trajectory t4 = drive.trajectoryBuilder(t3.end())
-                .splineTo(new Vector2d(0, 0), Math.toRadians(0))
-                .build();
-
-        Trajectory t5 = drive.trajectoryBuilder(t4.end())
-                .splineTo(new Vector2d(1, 28), Math.toRadians(0))
-                .build();
+//        Trajectory t3 = drive.trajectoryBuilder(startPose)
+//                .splineTo(new Vector2d(4.5, 66), Math.toRadians(0))
+//                .build();
+//
+//        Trajectory t4 = drive.trajectoryBuilder(t3.end())
+//                .splineTo(new Vector2d(0, 0), Math.toRadians(0))
+//                .build();
+//
+//        Trajectory t5 = drive.trajectoryBuilder(t4.end())
+//                .splineTo(new Vector2d(1, 28), Math.toRadians(0))
+//                .build();
 
 
 
         drive.followTrajectory(t1);
+        telemetry.addData("bbbbb", 5);
         drive.followTrajectory(t2);
-        drive.followTrajectory(t3);
-        drive.followTrajectory(t4);
-        drive.followTrajectory(t5);
+//        drive.followTrajectory(t3);
+//        drive.followTrajectory(t4);
+//        drive.followTrajectory(t5);
     }
 
     /**
