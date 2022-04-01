@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.auto;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
+import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilderKt;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -15,10 +17,11 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 
+import java.nio.channels.spi.AbstractSelectionKey;
 import java.util.List;
 
-@Autonomous(name = "Path Test Spline")
-public class PathTestingSpline extends LinearOpMode {
+@Autonomous(name = "Cycle Near")
+public class Cycle extends LinearOpMode {
     /* Note: This sample uses the all-objects Tensor Flow model (FreightFrenzy_BCDM.tflite), which contains
      * the following 4 detectable objects
      *  0: Ball,
@@ -74,7 +77,8 @@ public class PathTestingSpline extends LinearOpMode {
     Robot robot;
     SampleMecanumDrive drive;
 
-    Pose2d startPose = new Pose2d(32, -62, 270);
+
+    Pose2d startPose = new Pose2d(10, -62, Math.toRadians(0)); // 270 by itself was fine
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -146,130 +150,61 @@ public class PathTestingSpline extends LinearOpMode {
         waitForStart();
 
         if(opModeIsActive() && !isStopRequested()){
-            splinePaths();
+            splineCycle();
         }
     }
 
-    public void executeAutoPath(){
-        Trajectory offWall = drive.trajectoryBuilder(startPose)
-                .back(2)
+    //Pose2d startPose = new Pose2d(10, -60, Math.toRadians(0));
+    void splineCycle(){
+
+
+        Trajectory toHub = drive.trajectoryBuilder(startPose)
+                .lineToConstantHeading(new Vector2d(-19, -80))
                 .build();
 
-        Trajectory strafeHub = drive.trajectoryBuilder(offWall.end())
-                .strafeLeft(19)
+        Trajectory depot = drive.trajectoryBuilder(toHub.end())
+                .splineToLinearHeading(new Pose2d(13, -55, Math.toRadians(90)), 0)
                 .build();
 
-        Trajectory forwardHub = drive.trajectoryBuilder(strafeHub.end())
-                .back(18)
+        Trajectory intake = drive.trajectoryBuilder(depot.end())
+                .forward(30)
                 .build();
 
-        Trajectory frontWall = drive.trajectoryBuilder(forwardHub.end())
-                .forward(17.5)
+        Trajectory antiIntake = drive.trajectoryBuilder(intake.end())
+                .back(40)
                 .build();
 
-        Trajectory backToDuck = drive.trajectoryBuilder(frontWall.end().plus(new Pose2d(0, 0, Math.toRadians(-90))))
-                .forward(44)
+        Trajectory antiDepot = drive.trajectoryBuilder(antiIntake.end())
+                .splineToLinearHeading(new Pose2d(-19, -80, 270), Math.toRadians(90))
                 .build();
 
-        Trajectory parkWarehouseHalf = drive.trajectoryBuilder(backToDuck.end())
-                .back(50)
+        /*
+        Trajectory toHub = drive.trajectoryBuilder(startPose)
+                .lineToConstantHeading(new Vector2d(39, -11.5))
                 .build();
 
-        Trajectory strafeWall = drive.trajectoryBuilder(parkWarehouseHalf.end())
-                .strafeLeft(8)
+        Trajectory depot = drive.trajectoryBuilder(toHub.end())
+                .splineToLinearHeading(new Pose2d(62, 15.5, Math.toRadians(90)), 100)
                 .build();
 
-        Trajectory park = drive.trajectoryBuilder(strafeWall.end())
-                .back(45)
+        Trajectory intake = drive.trajectoryBuilder(depot.end())
+                .forward(30)
                 .build();
 
-        drive.followTrajectory(offWall);
-
-        robot.trayTilt.parallel();
-        robot.slides.dropOffHigh();
-
-        drive.followTrajectory(strafeHub);
-        drive.followTrajectory(forwardHub);
-
-        time.reset();
-        while(time.milliseconds() < 1000){
-            robot.trayTilt.tilt();
-        }
-        robot.trayTilt.parallel();
-        robot.slides.pickUp();
-//        while(robot.slides.slides.getCurrentPosition()-20 > robot.slides.slides.getTargetPosition()){ }
-
-        drive.followTrajectory(frontWall);
-        robot.trayTilt.ready();
-        drive.turn(Math.toRadians(-90));
-        drive.followTrajectory(backToDuck);
-        robot.duckMech.optimalSpin();
-        drive.followTrajectory(parkWarehouseHalf);
-        drive.followTrajectory(strafeWall);
-        drive.followTrajectory(park);
-    }
-
-    // x - negative is towards car,
-    // y - negative is towards door
-    public void splinePaths(){
-        Trajectory t1 = drive.trajectoryBuilder(startPose)
-                .lineToConstantHeading(new Vector2d(14, -40))
+        Trajectory antiIntake = drive.trajectoryBuilder(intake.end())
+                .back(40)
                 .build();
 
-        Trajectory t2 = drive.trajectoryBuilder(startPose)
-                .splineToLinearHeading(new Pose2d(17, -94, Math.toRadians(-60)), Math.toRadians(-10))
-                .build();
-
-        Trajectory t2Test = drive.trajectoryBuilder(startPose)
-                .splineToLinearHeading(new Pose2d(17, -78, Math.toRadians(-90)), Math.toRadians(50))
-                .build();
-
-        Trajectory t3Test = drive.trajectoryBuilder(t2Test.end())
-                .lineToConstantHeading(new Vector2d(19, -92))
-                .build();
-
-        Trajectory halfHouse = drive.trajectoryBuilder(t2.end())
-                //                                    30     0
-                .splineToLinearHeading(new Pose2d(17, -50, Math.toRadians(90)), Math.toRadians(0))
-                .build();
-
-        Trajectory fullHouse = drive.trajectoryBuilder(t3Test.end())
-                .lineToLinearHeading(new Pose2d(32, 0, Math.toRadians(180)))
-                .build();
-
-//        Trajectory t3 = drive.trajectoryBuilder(startPose)
-//                .splineTo(new Vector2d(4.5, 66), Math.toRadians(0))
-//                .build();
-//
-//        Trajectory t4 = drive.trajectoryBuilder(t3.end())
-//                .splineTo(new Vector2d(0, 0), Math.toRadians(0))
-//                .build();
-//
-//        Trajectory t5 = drive.trajectoryBuilder(t4.end())
-//                .splineTo(new Vector2d(1, 28), Math.toRadians(0))
-//                .build();
+        Trajectory antiDepot = drive.trajectoryBuilder(antiIntake.end())
+                .splineToLinearHeading(new Pose2d(39, -11.5, 270), Math.toRadians(90))
+                .build();*/
 
 
-
-//        robot.trayTilt.parallel();
-//        robot.slides.dropOffHigh();
-        drive.followTrajectory(t1);
-//        time.reset();
-//        while(time.milliseconds() < 1000){
-//            robot.trayTilt.tilt();
-//        }
-//        robot.trayTilt.parallel();
-//        robot.slides.pickUp();
-
-        drive.followTrajectory(t2Test);
-        drive.followTrajectory(t3Test);
-        robot.duckMech.optimalSpin();
-        //drive.followTrajectory(halfHouse);
-        drive.followTrajectory(fullHouse);
-
-//        drive.followTrajectory(t3);
-//        drive.followTrajectory(t4);
-//        drive.followTrajectory(t5);
+        drive.followTrajectory(toHub);
+        drive.followTrajectory(depot);
+        drive.followTrajectory(intake);
+        drive.followTrajectory(antiIntake);
+        drive.followTrajectory(antiDepot);
     }
 
     /**
