@@ -77,7 +77,7 @@ public class PathTesting extends LinearOpMode {
     Robot robot;
     SampleMecanumDrive drive;
 
-    Pose2d startPose = new Pose2d(0, 0, 0);
+    Pose2d startPose = new Pose2d(10, -60, Math.toRadians(270));
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -149,8 +149,59 @@ public class PathTesting extends LinearOpMode {
         waitForStart();
 
         if(opModeIsActive() && !isStopRequested()){
-            executeAutoPath();
+            good();
         }
+    }
+
+    public void good(){
+        Trajectory toDeposit = drive.trajectoryBuilder(startPose)
+                .lineToConstantHeading(new Vector2d(-11, -39))
+                .build();
+
+        Trajectory splineToWareHouse = drive.trajectoryBuilder(toDeposit.end())
+                .splineToLinearHeading(new Pose2d(30, -58, Math.toRadians(0)), Math.toRadians(-5))
+                .build();
+
+        Trajectory pickUpElement = drive.trajectoryBuilder(splineToWareHouse.end())
+                .forward(20)
+                .build();
+
+        Trajectory backUpElement = drive.trajectoryBuilder(pickUpElement.end())
+                .back(40)
+                .build();
+
+        Trajectory lineBack = drive.trajectoryBuilder(backUpElement.end())
+                .lineToLinearHeading(new Pose2d(-11, -39, Math.toRadians(270)))
+                .build();
+
+        drive.followTrajectory(toDeposit);
+        drive.followTrajectory(splineToWareHouse);
+        drive.followTrajectory(pickUpElement);
+        drive.followTrajectory(backUpElement);
+        drive.followTrajectory(lineBack);
+
+        drive.followTrajectory(splineToWareHouse);
+        drive.followTrajectory(pickUpElement);
+        drive.followTrajectory(backUpElement);
+        drive.followTrajectory(lineBack);
+
+        drive.followTrajectory(splineToWareHouse);
+        drive.followTrajectory(pickUpElement);
+        drive.followTrajectory(backUpElement);
+        drive.followTrajectory(lineBack);
+
+        drive.followTrajectory(splineToWareHouse);
+        drive.followTrajectory(pickUpElement);
+        drive.followTrajectory(backUpElement);
+        drive.followTrajectory(lineBack);
+    }
+
+    public void testPath(){
+        Trajectory move = drive.trajectoryBuilder(startPose)
+                .lineToConstantHeading(new Vector2d(0, 10))
+                .build();
+
+        drive.followTrajectory(move);
     }
 
     public void executeAutoPath(){

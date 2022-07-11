@@ -74,8 +74,6 @@ public class PathTestingSpline extends LinearOpMode {
     Robot robot;
     SampleMecanumDrive drive;
 
-    Pose2d startPose = new Pose2d(32, -62, 270);
-
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -146,8 +144,38 @@ public class PathTestingSpline extends LinearOpMode {
         waitForStart();
 
         if(opModeIsActive() && !isStopRequested()){
-            splinePaths();
+            good();
         }
+    }
+
+    Pose2d startPose = new Pose2d(10, -60, Math.toRadians(270));
+
+    public void good(){
+        Trajectory toDeposit = drive.trajectoryBuilder(startPose)
+                .lineToConstantHeading(new Vector2d(-11, -39))
+                .build();
+
+        Trajectory splineToWareHouse = drive.trajectoryBuilder(toDeposit.end())
+                .splineToLinearHeading(new Pose2d(30, -62, Math.toRadians(0)), Math.toRadians(-5))
+                .build();
+
+        Trajectory pickUpElement = drive.trajectoryBuilder(splineToWareHouse.end())
+                .forward(20)
+                .build();
+
+        Trajectory backUpElement = drive.trajectoryBuilder(pickUpElement.end())
+                .back(40)
+                .build();
+
+        Trajectory splineBack = drive.trajectoryBuilder(splineToWareHouse.end())
+                .splineTo(new Vector2d(-11, -39), Math.toRadians(-50))
+                .build();
+
+        drive.followTrajectory(toDeposit);
+        drive.followTrajectory(splineToWareHouse);
+        drive.followTrajectory(pickUpElement);
+        drive.followTrajectory(backUpElement);
+        drive.followTrajectory(splineBack);
     }
 
     public void executeAutoPath(){

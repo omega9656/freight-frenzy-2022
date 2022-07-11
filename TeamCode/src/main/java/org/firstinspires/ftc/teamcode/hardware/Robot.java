@@ -14,6 +14,9 @@ public class Robot {
     public TrayTilt trayTilt;
     public Intake intake;
 
+    public double worldXPosition;
+    public double worldYPosition;
+
     /***
      * takes hardware map from OpMode and creates deviceManager object
      * @param hardwareMap - hardwareMap from OpMode
@@ -37,5 +40,13 @@ public class Robot {
         slides = new Slides(deviceManager);
         duckMech = new DuckMech(deviceManager);
         trayTilt = new TrayTilt(deviceManager, autoRunning);
+    }
+
+    public double getWorldXPosition() {
+        return worldXPosition;
+    }
+
+    public double getWorldYPosition() {
+        return worldYPosition;
     }
 }

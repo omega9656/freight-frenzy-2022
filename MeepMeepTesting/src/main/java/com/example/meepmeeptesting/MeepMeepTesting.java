@@ -12,15 +12,15 @@ public class MeepMeepTesting {
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(30, 30, 58.2, 1.0471975511965976, 15.18)
-                .setStartPose(new Pose2d(10, -60, Math.toRadians(270)))
+                .setConstraints(40, 60, 58.2, 1.0471975511965976, 13.5)
+                .setStartPose(new Pose2d(0, 0, Math.toRadians(270)))
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(new Pose2d(10, -60, Math.toRadians(270)))
-                                .lineToConstantHeading(new Vector2d(-11.5, -39))
-                                .splineToLinearHeading(new Pose2d(15.5, -62, Math.toRadians(0)), 100)
-                                .forward(30)
-                                .back(30)
-                                .splineToLinearHeading(new Pose2d(-11.5, -39, Math.toRadians(270)), 1000)
+                                .lineToConstantHeading(new Vector2d(-11, -39))
+                                .splineToLinearHeading(new Pose2d(30, -60, Math.toRadians(0)), Math.toRadians(-2))
+                                .forward(20)
+                                .back(40)
+                                .lineToLinearHeading(new Pose2d(-11, -39, Math.toRadians(270)))
                                 .build()
                 );
 
