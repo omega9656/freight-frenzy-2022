@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.auto;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.path.heading.TangentInterpolator;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 import java.util.List;
 
@@ -151,12 +153,13 @@ public class PathTestingSpline extends LinearOpMode {
     Pose2d startPose = new Pose2d(10, -60, Math.toRadians(270));
 
     public void good(){
+
         Trajectory toDeposit = drive.trajectoryBuilder(startPose)
                 .lineToConstantHeading(new Vector2d(-11, -39))
                 .build();
 
-        Trajectory splineToWareHouse = drive.trajectoryBuilder(toDeposit.end())
-                .splineToLinearHeading(new Pose2d(30, -62, Math.toRadians(0)), Math.toRadians(-5))
+        Trajectory splineToWareHouse = drive.trajectoryBuilder(toDeposit.end()) // 30 -> 50                  -5
+                .splineToLinearHeading(new Pose2d(30, -60, Math.toRadians(0)), Math.toRadians(0))
                 .build();
 
         Trajectory pickUpElement = drive.trajectoryBuilder(splineToWareHouse.end())
@@ -164,18 +167,26 @@ public class PathTestingSpline extends LinearOpMode {
                 .build();
 
         Trajectory backUpElement = drive.trajectoryBuilder(pickUpElement.end())
-                .back(40)
+                .back(10)
                 .build();
 
-        Trajectory splineBack = drive.trajectoryBuilder(splineToWareHouse.end())
-                .splineTo(new Vector2d(-11, -39), Math.toRadians(-50))
+        Trajectory copySpline = drive.trajectoryBuilder(backUpElement.end())
+                .back(10)
+                .splineToSplineHeading(new Pose2d(-11, -39, Math.toRadians(-90)), Math.toRadians(-270))
                 .build();
 
         drive.followTrajectory(toDeposit);
         drive.followTrajectory(splineToWareHouse);
         drive.followTrajectory(pickUpElement);
-        drive.followTrajectory(backUpElement);
-        drive.followTrajectory(splineBack);
+        drive.followTrajectory(copySpline);
+
+        drive.followTrajectory(splineToWareHouse);
+        drive.followTrajectory(pickUpElement);
+        drive.followTrajectory(copySpline);
+
+        drive.followTrajectory(splineToWareHouse);
+        drive.followTrajectory(pickUpElement);
+        drive.followTrajectory(copySpline);
     }
 
     public void executeAutoPath(){

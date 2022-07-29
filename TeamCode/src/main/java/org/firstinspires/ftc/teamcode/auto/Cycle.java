@@ -83,9 +83,6 @@ public class Cycle extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        initVuforia();
-        initTfod();
-
         time  = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
         robot = new Robot(hardwareMap);
